@@ -17,9 +17,9 @@ By leveraging modern Speech-to-Text and Large Language Model (LLM) APIs, PulseVo
 ---
 
 ## 🛠 Technology Stack
-- Python 3.8+  
+- Python
 - **Speech-to-Text:** `SpeechRecognition` (Google Web Speech API)  
-- **Natural Language Understanding (NLU):** Google Gemini API / OpenAI GPT API  
+- **Natural Language Understanding (NLU):** Google Gemini API 
 - **Text-to-Speech:** `gTTS` (Google Text-to-Speech)  
 - **Audio Playback:** `playsound`  
 - **Terminal Styling:** `rich`
@@ -52,7 +52,7 @@ pip install -r requirements.txt
 > You may need to install *portaudio* for PyAudio to work correctly. Refer to the PyAudio documentation for platform-specific instructions.
 
 ### 4️⃣ Configure Your API Key
-1. Get your API key from [Google AI Studio](https://aistudio.google.com/) or [OpenAI Platform](https://platform.openai.com/).  
+1. Get your API key from [Google AI Studio](https://aistudio.google.com/).  
 2. Open `pulsevox.py`.  
 3. Replace `API_KEY = "YOUR_API_KEY_HERE"` with your actual key.
 
@@ -73,5 +73,3 @@ The script will prompt you to speak, transcribe your command, and show the struc
 - **Scheduling Intelligence** with calendar conflict detection  
 - **Database Integration** 
 - **Web UI** using Streamlit or Gradio  
-
----
