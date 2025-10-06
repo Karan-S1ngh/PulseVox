@@ -67,8 +67,7 @@ The script will prompt you to speak, transcribe your command, and show the struc
 
 ---
 
-## 🔮 Future Scope
-- Full **Multilingual Support** (Hindi + Hinglish)  
+## 🔮 Future Scope 
 - **Custom Wake Word** using Picovoice Porcupine  
 - **Conversational Context** memory system  
 - **Scheduling Intelligence** with calendar conflict detection  
