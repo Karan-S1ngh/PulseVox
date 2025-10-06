@@ -12,11 +12,11 @@ from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv()
 
-# --- LLM Integration ---
+# LLM Integration
 import google.generativeai as genai
 
-# --- Configuration ---
-API_KEY = os.getenv("GEMINI_API_KEY") # Note: Changed to GEMINI_API_KEY to match .env standard
+# Configuration
+API_KEY = os.getenv("GEMINI_API_KEY")
 LLM_PROVIDER = "google"
 
 # Configure the LLM provider
@@ -30,7 +30,6 @@ if LLM_PROVIDER == "google":
 # Initialize Rich Console for beautiful terminal output
 console = Console()
 
-# --- Function Definitions ---
 
 def speak(text, lang='en'):
     """Converts text to speech and plays it."""
@@ -125,11 +124,9 @@ def save_tasks(tasks):
     console.print(f"[bold green]Successfully saved {len(tasks)} new task(s) to {filename}[/bold green]")
 
 
-# --- Main Application Logic (Runs directly at the script level) ---
-
 console.print(Panel.fit("[bold magenta]Welcome to PulseVox 🗣️✨[/bold magenta]\nYour Command-Line Planning Assistant"))
 
-# This loop will run forever until you stop it
+# This loop will run forever until stopped
 while True:
     command = listen_for_command()
 
