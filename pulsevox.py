@@ -76,7 +76,6 @@ CRITICAL RULES FOR TIME EXTRACTION:
 The user's command will follow. Respond ONLY with the valid JSON object.
 """
 
-# --- Initialize Model and Chat Session ---
 llm_model = genai.GenerativeModel(
     'models/gemini-2.5-flash',
     system_instruction=system_prompt
@@ -294,7 +293,7 @@ def handle_task_update(find_details, update_details, all_tasks):
     if not find_details or not update_details:
         return "Sorry, I didn't catch what you wanted to change or what you wanted to change it to."
 
-    # --- 1. Find the task (using the same logic as remove) ---
+    # Find the task (using the same logic as remove)
     desc_to_match = (find_details.get('task_description') or "").lower()
     time_to_match = find_details.get('start_time')
     date_to_match = find_details.get('date')
@@ -322,7 +321,7 @@ def handle_task_update(find_details, update_details, all_tasks):
             best_score = current_score
             best_match_index = i
 
-    # --- 2. Update the task if found ---
+    # Update the task if found
     if best_match_index != -1 and best_score >= 10:
         task_to_update = all_tasks[best_match_index]
         original_desc = get_task_description(task_to_update)
@@ -412,7 +411,7 @@ if __name__ == "__main__":
                         else:
                             answer_schedule_query(response_data.get("date_query"))
                     
-                    # --- NEW: Handle Summarization ---
+                    # Handle Summarization
                     elif intent == "summarize_schedule":
                         date_query = response_data.get("date_query")
                         if not date_query:
