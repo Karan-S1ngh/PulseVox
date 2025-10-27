@@ -231,7 +231,7 @@ def handle_web_summarization(date_query):
 
 
 st.set_page_config(layout="wide", page_title="PulseVox Demo")
-st.title("PulseVox 🗣️✨ - NLP Demo Interface")
+st.title("PulseVox 🗣️✨ - Prototype Demo Interface")
 
 # Initialize the chat session and models (runs only once)
 initialize_state()
