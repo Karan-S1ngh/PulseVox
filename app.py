@@ -34,9 +34,9 @@ except ImportError:
 
 load_dotenv()
 API_KEY = os.getenv("GEMINI_API_KEY")
-if not API_KEY:
-    st.error("ERROR: GEMINI_API_KEY is not set or couldn't be found in .env file.")
-    st.stop()
+# if not API_KEY:
+#     st.error("ERROR: GEMINI_API_KEY is not set or couldn't be found in .env file.")
+#     # st.stop()
 
 genai.configure(api_key=API_KEY)
 TASK_FILE = "tasks.json"
