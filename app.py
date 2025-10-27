@@ -1,6 +1,3 @@
-# app.py
-# Run with: streamlit run app.py
-
 import streamlit as st
 import os
 import json
@@ -70,7 +67,6 @@ if not ffmpeg_path_to_set:
          st.sidebar.error(f"FFmpeg not found via winget or system PATH. Audio conversion will fail. Please install FFmpeg and add it to PATH. Details: {e}")
          # Consider st.stop() if FFmpeg is absolutely essential
 
-
 def initialize_state():
     """Initializes the models and chat history in Streamlit's session state."""
     # Initialize only if 'initialized' flag is not set
@@ -106,7 +102,6 @@ def initialize_state():
             st.error(f"Failed to initialize Gemini model: {e}")
             # Potentially stop the app if initialization fails critically
             # st.stop()
-
 
 def transcribe_audio(audio_dict):
     """Transcribes audio bytes from the web recorder's output dict."""
@@ -186,7 +181,6 @@ def handle_web_schedule_query(date_query):
              joined_tasks = task_descriptions[0] if task_descriptions else "nothing"
         return f"For {date_query}, you have {len(tasks_for_date)} tasks: {joined_tasks}."
 
-
 def handle_web_specific_time_query(date_query, time_query):
     """Web-friendly version: Returns text instead of speaking."""
     all_tasks = load_all_tasks()
@@ -234,7 +228,6 @@ def handle_web_summarization(date_query):
          return response.text.strip()
      except Exception as e:
          return f"I found your tasks but had trouble summarizing them: {e}"
-
 
 
 st.set_page_config(layout="wide", page_title="PulseVox Demo")
@@ -424,7 +417,6 @@ with col1:
                 elif assistant_message.startswith("⚠️") or assistant_message.startswith("❓"): st.warning(assistant_message)
                 else: st.error(assistant_message) # Default to error if prefix missing or unknown
 
-
             except json.JSONDecodeError:
                  st.error("❌ **Error:** The LLM returned invalid JSON. Could not process.")
                  if "history" in st.session_state:
@@ -492,3 +484,4 @@ with col2:
             st.json(all_tasks) # Display raw JSON if DataFrame fails
     else:
         st.write("No tasks in your schedule yet.")
+        
