@@ -1,3 +1,9 @@
+import os
+import sys # Add sys import
+print(f"Current Working Directory: {os.getcwd()}") # Check where the script is running
+print(f"Directory Contents: {os.listdir()}")     # Check what files are in that directory
+print(f"Python Path: {sys.path}")                 # Check where Python is looking for imports
+
 import streamlit as st
 import os
 import json
@@ -9,7 +15,6 @@ import speech_recognition as sr
 import io
 from streamlit_mic_recorder import mic_recorder
 from pydub import AudioSegment
-import os 
 import glob # For finding FFmpeg
 
 try:
