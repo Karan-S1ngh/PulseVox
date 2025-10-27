@@ -68,8 +68,6 @@ The script will prompt you to speak, transcribe your command, and show the struc
 ---
 
 ## 🔮 Future Scope 
-- **Custom Wake Word** using Picovoice Porcupine  
-- **Conversational Context** memory system  
-- **Scheduling Intelligence** with calendar conflict detection  
+- **Scheduling Intelligence** with calendar integration  
 - **Database Integration** 
-- **Web UI** using Streamlit or Gradio  
+- **Web UI** using Streamlit
