@@ -3,7 +3,6 @@ import json
 from datetime import datetime
 import speech_recognition as sr
 from gtts import gTTS
-from playsound import playsound
 from rich.console import Console
 from rich.panel import Panel
 from rich.syntax import Syntax
@@ -95,6 +94,7 @@ summarizer_system_prompt = "You are a helpful assistant. You answer user request
 def speak(text, lang='en'):
     """Converts text to speech and plays it."""
     try:
+        from playsound import playsound
         tts = gTTS(text=text, lang=lang, slow=False)
         filename = "response.mp3"
         tts.save(filename)
