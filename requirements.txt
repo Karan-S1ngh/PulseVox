@@ -6,3 +6,5 @@ pydub
 streamlit-mic-recorder
 python-dotenv
 gtts
+playsound
+rich
