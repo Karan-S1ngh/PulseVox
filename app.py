@@ -97,6 +97,7 @@ def initialize_state():
             st.session_state.history = []
             
             # 6. Set initialized flag
+            st.session_state.message_to_speak = None
             st.session_state.initialized = True
 
         except Exception as e:
@@ -151,7 +152,6 @@ def speak_web(text_to_speak):
     """Generates speech audio and embeds it in Streamlit."""
     if not text_to_speak: # Don't try to speak if message is empty
         return
-        
     try:
         tts = gTTS(text=text_to_speak, lang='en', slow=False)
         # Create an in-memory file-like object
@@ -167,9 +167,11 @@ def speak_web(text_to_speak):
 def handle_web_schedule_query(date_query):
     """Web-friendly version: Returns text instead of speaking."""
     all_tasks = load_all_tasks()
-    if not all_tasks: return "You don't have any tasks saved yet."
+    if not all_tasks: 
+        return "You don't have any tasks saved yet."
     tasks_for_date = [task for task in all_tasks if task.get('date') == date_query]
-    if not tasks_for_date: return f"You have nothing scheduled for {date_query}."
+    if not tasks_for_date: 
+        return f"You have nothing scheduled for {date_query}."
     tasks_for_date.sort(key=lambda x: datetime.strptime(x.get('start_time', '00:00'), "%H:%M"))
     task_descriptions = []
     for task in tasks_for_date:
@@ -202,10 +204,12 @@ def handle_web_schedule_query(date_query):
 def handle_web_specific_time_query(date_query, time_query):
     """Web-friendly version: Returns text instead of speaking."""
     all_tasks = load_all_tasks()
-    if not all_tasks: return "You don't have any tasks saved yet."
+    if not all_tasks: 
+        return "You don't have any tasks saved yet."
     try:
         time_format = "%H:%M"; query_time = datetime.strptime(time_query, time_format).time()
-    except ValueError: return f"Sorry, I didn't understand the time {time_query}."
+    except ValueError: 
+        return f"Sorry, I didn't understand the time {time_query}."
     found_task = None
     for task in all_tasks:
         # Check date and ensure time keys exist before parsing
@@ -216,7 +220,8 @@ def handle_web_specific_time_query(date_query, time_query):
                 # Check for overlap: query time is within [start_time, end_time)
                 if start_time <= query_time < end_time:
                     found_task = task; break
-            except ValueError: continue # Ignore tasks with invalid time format
+            except ValueError: 
+                continue # Ignore tasks with invalid time format
     if found_task:
         task_desc = get_task_description(found_task)
         start_str = datetime.strptime(found_task['start_time'], time_format).strftime("%I:%M %p").lstrip('0')
@@ -228,24 +233,26 @@ def handle_web_specific_time_query(date_query, time_query):
 
 # Wrapper for summarization to pass the correct model from state
 def handle_web_summarization(date_query):
-     """Web-friendly version: Returns summary text."""
-     if "summarizer_model" not in st.session_state:
-         return "Summarizer model not initialized."
+    """Web-friendly version: Returns summary text."""
+    if "summarizer_model" not in st.session_state:
+        return "Summarizer model not initialized."
 
-     all_tasks = load_all_tasks()
-     if not all_tasks: return "You don't have any tasks saved yet."
-     tasks_for_date = [task for task in all_tasks if task.get('date') == date_query]
-     if not tasks_for_date: return f"You have nothing scheduled for {date_query}."
-     tasks_for_date.sort(key=lambda x: datetime.strptime(x.get('start_time', '00:00'), "%H:%M"))
-     task_descriptions = [f"- {get_task_description(task)} at {task.get('start_time', 'all day')}" for task in tasks_for_date]
-     tasks_str = "\n".join(task_descriptions)
-     try:
-         summary_prompt = (f"Here is a list of my tasks for {date_query}:\n{tasks_str}\n\n"
+    all_tasks = load_all_tasks()
+    if not all_tasks: 
+        return "You don't have any tasks saved yet."
+    tasks_for_date = [task for task in all_tasks if task.get('date') == date_query]
+    if not tasks_for_date: 
+        return f"You have nothing scheduled for {date_query}."
+    tasks_for_date.sort(key=lambda x: datetime.strptime(x.get('start_time', '00:00'), "%H:%M"))
+    task_descriptions = [f"- {get_task_description(task)} at {task.get('start_time', 'all day')}" for task in tasks_for_date]
+    tasks_str = "\n".join(task_descriptions)
+    try:
+        summary_prompt = (f"Here is a list of my tasks for {date_query}:\n{tasks_str}\n\n"
                            f"Please write a brief, natural language summary of my day (in one or two sentences).")
-         response = st.session_state.summarizer_model.generate_content(summary_prompt)
-         return response.text.strip()
-     except Exception as e:
-         return f"I found your tasks but had trouble summarizing them: {e}"
+        response = st.session_state.summarizer_model.generate_content(summary_prompt)
+        return response.text.strip()
+    except Exception as e:
+        return f"I found your tasks but had trouble summarizing them: {e}"
 
 # Streamlit UI
 st.set_page_config(layout="wide", page_title="PulseVox Demo")
@@ -425,7 +432,8 @@ with col1:
                 else:
                     # Handle cases where LLM gives JSON but no known intent
                     assistant_message = f"❓ I received data but couldn't understand the intent: '{intent}'."
-
+                st.session_state.message_to_speak = assistant_message
+                    
                 # 4. Save assistant's reply and show message
                 if "history" in st.session_state and st.session_state.history:
                     if assistant_message:
@@ -456,7 +464,10 @@ with col1:
 
             #  Rerun AFTER processing 
             st.rerun() # Refresh UI
-
+    if "message_to_speak" in st.session_state and st.session_state.message_to_speak:
+        speak_web(st.session_state.message_to_speak)
+        st.session_state.message_to_speak = None # Clear the message after speaking
+    
     st.divider()
 
     #  History Display 
