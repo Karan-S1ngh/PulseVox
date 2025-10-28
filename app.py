@@ -153,7 +153,36 @@ def speak_web(text_to_speak):
     if not text_to_speak: # Don't try to speak if message is empty
         return
     try:
-        tts = gTTS(text=text_to_speak, lang='en', slow=False)
+        # 1. Define all prefixes and symbols to remove
+        prefixes_to_remove = [
+            "✅ **Success:**", 
+            "🗓️ **Summary:**", 
+            "🗓️ **Schedule:**",
+            "🗓️ **Availability:**",
+            "❌ **CONFLICT:**",
+            "❌ **Error:**",
+            "⚠️", # Warning emoji
+            "❓", # Question emoji
+            "✅", # Check emoji
+            "🗓️", # Calendar emoji
+            "❌", # Cross emoji
+        ]
+        
+        clean_text = text_to_speak # Start with the full message
+        
+        # 2. Remove known prefixes first by checking the start of the string
+        for prefix in prefixes_to_remove:
+            if clean_text.startswith(prefix):
+                clean_text = clean_text[len(prefix):] # Remove the prefix by slicing
+                break # Stop after finding the first match
+        
+        # 3. Remove remaining markdown/symbols (like asterisks)
+        clean_text = clean_text.replace("*", "").strip() # Remove asterisks and trim whitespace
+        
+        if not clean_text:
+            return
+        
+        tts = gTTS(text=clean_text, lang='en', slow=False)
         # Create an in-memory file-like object
         mp3_fp = io.BytesIO()
         tts.write_to_fp(mp3_fp)
@@ -343,8 +372,8 @@ with col1:
             try:
                 # 1. Get JSON response
                 if "chat_session" not in st.session_state:
-                     st.error("Chat session not initialized.")
-                     st.stop() # Stop execution if chat session isn't ready
+                    st.error("Chat session not initialized.")
+                    st.stop() # Stop execution if chat session isn't ready
                 chat_session = st.session_state.chat_session
                 response = chat_session.send_message(command_to_process)
                 json_response_text = response.text.strip().lstrip("```json").rstrip("```").strip()
@@ -441,26 +470,29 @@ with col1:
 
                 # Display message based on prefix or default to info
                 if assistant_message:
-                    if assistant_message.startswith("✅"): st.success(assistant_message)
-                    elif assistant_message.startswith("🗓️"): st.info(assistant_message)
-                    elif assistant_message.startswith("⚠️") or assistant_message.startswith("❓"): st.warning(assistant_message)
+                    if assistant_message.startswith("✅"): 
+                        st.success(assistant_message)
+                    elif assistant_message.startswith("🗓️"): 
+                        st.info(assistant_message)
+                    elif assistant_message.startswith("⚠️") or assistant_message.startswith("❓"): 
+                        st.warning(assistant_message)
                     else: st.error(assistant_message) # Default to error if prefix missing or unknown
-                    speak_web(assistant_message)
+                st.session_state.message_to_speak = assistant_message
                     
             except json.JSONDecodeError:
                 st.error("**Error:** The LLM returned invalid JSON. Could not process.")
                 if "history" in st.session_state:
                     st.session_state.history.append({"user": command_to_process, "json": json_response_text, "assistant": "Error: Invalid JSON."})
-                    speak_web("I encountered an error processing your command.")
+                st.session_state.message_to_speak = "I encountered an error processing your command."
 
             except Exception as e:
                 st.error(f"**An unexpected error occurred:** {e}")
-                 # Optionally log the full traceback for debugging
-                 # import traceback
-                 # st.error(traceback.format_exc())
+                # Optionally log the full traceback for debugging
+                # import traceback
+                # st.error(traceback.format_exc())
                 if "history" in st.session_state:
                     st.session_state.history.append({"user": command_to_process, "json": "N/A", "assistant": f"Error: {e}"})
-                    speak_web("I encountered an error processing your command.")
+                    st.session_state.message_to_speak = "I encountered an error processing your command."
 
             #  Rerun AFTER processing 
             st.rerun() # Refresh UI
