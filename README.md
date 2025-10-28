@@ -93,11 +93,13 @@ Access the deployed application directly in your browser:
 To run the Streamlit interface on your local machine:
 ```bash
 streamlit run app.py
+```
 
 ### 3. Local Command Line Demo
 To run the original, audio-feedback-in-terminal version:
 ```bash
 python pulsevox.py
+```
 
 ---
 
