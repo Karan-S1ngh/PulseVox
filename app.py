@@ -9,7 +9,8 @@ import speech_recognition as sr
 import io
 from streamlit_mic_recorder import mic_recorder
 from pydub import AudioSegment
-import glob # For finding FFmpeg
+from gtts import gTTS
+# import glob # For finding FFmpeg
 
 try:
     from pulsevox import (
@@ -145,6 +146,23 @@ def transcribe_audio(audio_dict):
     except sr.RequestError as e:
         st.error(f"Speech service error; {e}")
         return None
+    
+def speak_web(text_to_speak):
+    """Generates speech audio and embeds it in Streamlit."""
+    if not text_to_speak: # Don't try to speak if message is empty
+        return
+        
+    try:
+        tts = gTTS(text=text_to_speak, lang='en', slow=False)
+        # Create an in-memory file-like object
+        mp3_fp = io.BytesIO()
+        tts.write_to_fp(mp3_fp)
+        # Reset the stream position to the beginning
+        mp3_fp.seek(0)
+        # Embed the audio player
+        st.audio(mp3_fp, format='audio/mp3', start_time=0)
+    except Exception as e:
+        st.error(f"Error generating or playing audio feedback: {e}")
 
 def handle_web_schedule_query(date_query):
     """Web-friendly version: Returns text instead of speaking."""
@@ -229,7 +247,7 @@ def handle_web_summarization(date_query):
      except Exception as e:
          return f"I found your tasks but had trouble summarizing them: {e}"
 
-
+# Streamlit UI
 st.set_page_config(layout="wide", page_title="PulseVox Demo")
 st.title("PulseVox 🗣️✨ - Prototype Demo Interface")
 
@@ -314,6 +332,7 @@ with col1:
     #  Step 4: Processing Logic 
     if process_now and command_to_process:
         with st.spinner("Analyzing with PulseVox Engine..."):
+            assistant_message = ""
             try:
                 # 1. Get JSON response
                 if "chat_session" not in st.session_state:
@@ -408,25 +427,32 @@ with col1:
                     assistant_message = f"❓ I received data but couldn't understand the intent: '{intent}'."
 
                 # 4. Save assistant's reply and show message
-                if "history" in st.session_state: # Ensure history list exists
-                    st.session_state.history[-1]["assistant"] = assistant_message # Add assistant msg to last history entry
+                if "history" in st.session_state and st.session_state.history:
+                    if assistant_message:
+                        st.session_state.history[-1]["assistant"] = assistant_message # Add assistant msg to last history entry
 
                 # Display message based on prefix or default to info
-                if assistant_message.startswith("✅"): st.success(assistant_message)
-                elif assistant_message.startswith("🗓️"): st.info(assistant_message)
-                elif assistant_message.startswith("⚠️") or assistant_message.startswith("❓"): st.warning(assistant_message)
-                else: st.error(assistant_message) # Default to error if prefix missing or unknown
-
+                if assistant_message:
+                    if assistant_message.startswith("✅"): st.success(assistant_message)
+                    elif assistant_message.startswith("🗓️"): st.info(assistant_message)
+                    elif assistant_message.startswith("⚠️") or assistant_message.startswith("❓"): st.warning(assistant_message)
+                    else: st.error(assistant_message) # Default to error if prefix missing or unknown
+                    speak_web(assistant_message)
+                    
             except json.JSONDecodeError:
-                 st.error("**Error:** The LLM returned invalid JSON. Could not process.")
-                 if "history" in st.session_state:
-                     st.session_state.history.append({"user": command_to_process, "json": json_response_text, "assistant": "Error: Invalid JSON."})
+                st.error("**Error:** The LLM returned invalid JSON. Could not process.")
+                if "history" in st.session_state:
+                    st.session_state.history.append({"user": command_to_process, "json": json_response_text, "assistant": "Error: Invalid JSON."})
+                    speak_web("I encountered an error processing your command.")
 
             except Exception as e:
-                 st.error(f"**An unexpected error occurred:** {e}")
+                st.error(f"**An unexpected error occurred:** {e}")
                  # Optionally log the full traceback for debugging
                  # import traceback
                  # st.error(traceback.format_exc())
+                if "history" in st.session_state:
+                    st.session_state.history.append({"user": command_to_process, "json": "N/A", "assistant": f"Error: {e}"})
+                    speak_web("I encountered an error processing your command.")
 
             #  Rerun AFTER processing 
             st.rerun() # Refresh UI
@@ -463,10 +489,8 @@ with col2:
         try:
             df = pd.DataFrame(all_tasks)
 
-            #  SAFER WAY TO GET DESCRIPTION 
             # Ensure apply uses a dict representation of the row
             df['task_description'] = df.apply(lambda row: get_task_description(row.to_dict()), axis=1)
-            #  END SAFER WAY 
 
             cols_to_show = ['task_description', 'category', 'date', 'start_time', 'end_time', 'status']
             # Filter based on actual columns present in the DataFrame
@@ -474,7 +498,7 @@ with col2:
 
             # Ensure 'task_description' is included if available
             if 'task_description' in df.columns and 'task_description' not in display_cols:
-                 display_cols.insert(0, 'task_description') # Add to beginning if missing
+                display_cols.insert(0, 'task_description') # Add to beginning if missing
 
             st.dataframe(df[display_cols], width='stretch', hide_index=True) # FIX: Use width='stretch'
 
