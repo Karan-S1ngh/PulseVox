@@ -76,17 +76,21 @@ CRITICAL RULES FOR TIME EXTRACTION:
 The user's command will follow. Respond ONLY with the valid JSON object.
 """
 
-llm_model = genai.GenerativeModel(
-    'models/gemini-2.5-flash',
-    system_instruction=system_prompt
-)
-chat_session = llm_model.start_chat(history=[])
+# llm_model = genai.GenerativeModel(
+#     'models/gemini-2.5-flash',
+#     system_instruction=system_prompt
+# )
+# chat_session = llm_model.start_chat(history=[])
+
+llm_model = None
+chat_session = None
+summarizer_model = None
 
 summarizer_system_prompt = "You are a helpful assistant. You answer user requests in natural, conversational language. You do NOT output JSON."
-summarizer_model = genai.GenerativeModel(
-    'models/gemini-2.5-flash',
-    system_instruction=summarizer_system_prompt
-)
+# summarizer_model = genai.GenerativeModel(
+#     'models/gemini-2.5-flash',
+#     system_instruction=summarizer_system_prompt
+# )
 
 def speak(text, lang='en'):
     """Converts text to speech and plays it."""
@@ -378,6 +382,10 @@ def handle_summarization(date_query):
 if __name__ == "__main__":
     console.print(Panel.fit("[bold magenta]Welcome to PulseVox 🗣️✨[/bold magenta]\nYour Command-Line Planning Assistant"))
 
+    llm_model = genai.GenerativeModel('models/gemini-2.5-flash', system_instruction=system_prompt)
+    chat_session = llm_model.start_chat(history=[])
+    summarizer_model = genai.GenerativeModel('models/gemini-2.5-flash', system_instruction=summarizer_system_prompt)
+    
     while True:
         command = listen_for_command()
         if command:

@@ -1,9 +1,3 @@
-import os
-import sys # Add sys import
-print(f"Current Working Directory: {os.getcwd()}") # Check where the script is running
-print(f"Directory Contents: {os.listdir()}")     # Check what files are in that directory
-print(f"Python Path: {sys.path}")                 # Check where Python is looking for imports
-
 import streamlit as st
 import os
 import json
@@ -99,14 +93,15 @@ def initialize_state():
 
             # 5. State flags for audio processing
             st.session_state.audio_command_ready = None # None: no audio, "": failed trans, str: ready
-
+            st.session_state.history = []
+            
             # 6. Set initialized flag
             st.session_state.initialized = True
 
         except Exception as e:
             st.error(f"Failed to initialize Gemini model: {e}")
             # Potentially stop the app if initialization fails critically
-            # st.stop()
+            st.stop()
 
 def transcribe_audio(audio_dict):
     """Transcribes audio bytes from the web recorder's output dict."""
@@ -294,7 +289,7 @@ with col1:
     if st.session_state.audio_command_ready: # Check if not None and not empty string
         command_to_process = st.session_state.audio_command_ready
         process_now = True
-        st.session_state.audio_command_ready = None # CRITICAL: Reset state *before* processing
+        st.session_state.audio_command_ready = None # Reset state *before* processing
 
     #  Step 3: Text Input & Manual Process Button 
     user_command_text = st.text_input(
@@ -423,12 +418,12 @@ with col1:
                 else: st.error(assistant_message) # Default to error if prefix missing or unknown
 
             except json.JSONDecodeError:
-                 st.error("❌ **Error:** The LLM returned invalid JSON. Could not process.")
+                 st.error("**Error:** The LLM returned invalid JSON. Could not process.")
                  if "history" in st.session_state:
                      st.session_state.history.append({"user": command_to_process, "json": json_response_text, "assistant": "Error: Invalid JSON."})
 
             except Exception as e:
-                 st.error(f"❌ **An unexpected error occurred:** {e}")
+                 st.error(f"**An unexpected error occurred:** {e}")
                  # Optionally log the full traceback for debugging
                  # import traceback
                  # st.error(traceback.format_exc())
@@ -460,7 +455,7 @@ with col1:
 with col2:
     st.header("Current Schedule (tasks.json)")
 
-    if st.button("Refresh List 🔄"):
+    if st.button("Refresh List"):
         st.rerun()
 
     all_tasks = load_all_tasks()
