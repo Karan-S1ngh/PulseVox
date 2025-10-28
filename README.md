@@ -107,13 +107,13 @@ python pulsevox.py
 
 This project has a strong foundation for many advanced features. Here are some potential next steps:
 
-* **Database Integration:** Replace `tasks.json` with a robust database. This would allow for faster queries, better data management, and scalability.
-* **Scheduling Intelligence & Calendar Integration:** Connect to Google Calendar or Outlook APIs.
+- **Database Integration:** Replace `tasks.json` with a robust database. This would allow for faster queries, better data management, and scalability.
+- **Scheduling Intelligence & Calendar Integration:** Connect to Google Calendar or Outlook APIs.
     * Automatically check for *real-world* calendar conflicts.
     * Suggest free time slots for new tasks ("I see you're free at 4 PM, shall I schedule it then?").
-* **Proactive Scheduling Assistant:**
+- **Proactive Scheduling Assistant:**
     * Learn user habits and make intelligent suggestions (e.g., "You have three meetings in a row. Would you like me to schedule a 15-minute break?").
     * Analyze task lists and suggest priorities based on due dates or keywords.
-* **Email Task-Import Engine:** Allow users to forward an email to a special address. The app would use NLP to parse the email, find action items or deadlines, and automatically suggest them as new tasks.
-* **Productivity Dashboard:** Add a new tab to the Streamlit app that analyzes and visualizes task data, showing pie charts of task categories or a heatmap of your busiest times.
-* **Push Notifications:** Integrate with a service to send email or mobile push notifications 10 minutes before a task's `start_time` is due.
+- **Email Task-Import Engine:** Allow users to forward an email to a special address. The app would use NLP to parse the email, find action items or deadlines, and automatically suggest them as new tasks.
+- **Productivity Dashboard:** Add a new tab to the Streamlit app that analyzes and visualizes task data, showing pie charts of task categories or a heatmap of your busiest times.
+- **Push Notifications:** Integrate with a service to send email or mobile push notifications 10 minutes before a task's `start_time` is due.
