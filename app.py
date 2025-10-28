@@ -35,36 +35,36 @@ API_KEY = os.getenv("GEMINI_API_KEY")
 genai.configure(api_key=API_KEY)
 TASK_FILE = "tasks.json"
 
-username = os.getlogin() # Get current username
-# Ensure the path uses raw string or escaped backslashes
-# Use glob to find the specific version folder as it might change
-ffmpeg_winget_path_pattern = rf"C:\Users\{username}\AppData\Local\Microsoft\WinGet\Packages\Gyan.FFmpeg_Microsoft.Winget.Source_*\ffmpeg-*-full_build\bin\ffmpeg.exe"
+# username = os.getlogin() # Get current username
+# # Ensure the path uses raw string or escaped backslashes
+# # Use glob to find the specific version folder as it might change
+# ffmpeg_winget_path_pattern = rf"C:\Users\{username}\AppData\Local\Microsoft\WinGet\Packages\Gyan.FFmpeg_Microsoft.Winget.Source_*\ffmpeg-*-full_build\bin\ffmpeg.exe"
 
-ffmpeg_paths = glob.glob(ffmpeg_winget_path_pattern)
-ffmpeg_path_to_set = None
-if ffmpeg_paths:
-    # Sort paths to get the latest version if multiple exist (though unlikely for same package ID)
-    ffmpeg_paths.sort(reverse=True)
-    ffmpeg_path_to_set = ffmpeg_paths[0] # Use the first (potentially latest) match
-    try:
-        AudioSegment.converter = ffmpeg_path_to_set
-        # st.sidebar.info(f"Using FFmpeg found at: {ffmpeg_path_to_set}") # Optional confirmation in sidebar
-    except Exception as e:
-        st.sidebar.error(f"Error setting FFmpeg path ({ffmpeg_path_to_set}): {e}. Make sure FFmpeg is correctly installed and accessible.")
-        ffmpeg_path_to_set = None # Indicate failure
+# ffmpeg_paths = glob.glob(ffmpeg_winget_path_pattern)
+# ffmpeg_path_to_set = None
+# if ffmpeg_paths:
+#     # Sort paths to get the latest version if multiple exist (though unlikely for same package ID)
+#     ffmpeg_paths.sort(reverse=True)
+#     ffmpeg_path_to_set = ffmpeg_paths[0] # Use the first (potentially latest) match
+#     try:
+#         AudioSegment.converter = ffmpeg_path_to_set
+#         # st.sidebar.info(f"Using FFmpeg found at: {ffmpeg_path_to_set}") # Optional confirmation in sidebar
+#     except Exception as e:
+#         st.sidebar.error(f"Error setting FFmpeg path ({ffmpeg_path_to_set}): {e}. Make sure FFmpeg is correctly installed and accessible.")
+#         ffmpeg_path_to_set = None # Indicate failure
 
-if not ffmpeg_path_to_set:
-    # If winget path failed or not found, try relying on PATH
-    try:
-        # pydub checks PATH by default if AudioSegment.converter is not set
-         # Attempt a dummy conversion to see if it works via PATH
-         dummy_input = io.BytesIO(b'\0'*100) # Create dummy bytes
-         # Need format, rate, channels, width for raw data
-         AudioSegment.from_file(dummy_input, format="raw", frame_rate=44100, channels=1, sample_width=1)
-         # st.sidebar.info("Using FFmpeg found in system PATH.") # Optional
-    except Exception as e:
-         st.sidebar.error(f"FFmpeg not found via winget or system PATH. Audio conversion will fail. Please install FFmpeg and add it to PATH. Details: {e}")
-         # Consider st.stop() if FFmpeg is absolutely essential
+# if not ffmpeg_path_to_set:
+#     # If winget path failed or not found, try relying on PATH
+#     try:
+#         # pydub checks PATH by default if AudioSegment.converter is not set
+#          # Attempt a dummy conversion to see if it works via PATH
+#          dummy_input = io.BytesIO(b'\0'*100) # Create dummy bytes
+#          # Need format, rate, channels, width for raw data
+#          AudioSegment.from_file(dummy_input, format="raw", frame_rate=44100, channels=1, sample_width=1)
+#          # st.sidebar.info("Using FFmpeg found in system PATH.") # Optional
+#     except Exception as e:
+#          st.sidebar.error(f"FFmpeg not found via winget or system PATH. Audio conversion will fail. Please install FFmpeg and add it to PATH. Details: {e}")
+#          # Consider st.stop() if FFmpeg is absolutely essential
 
 def initialize_state():
     """Initializes the models and chat history in Streamlit's session state."""
